@@ -56,6 +56,8 @@ This implementation is primarily operated through a context structure `sm4_avx_c
 *   **Hardware Support**: The target machine executing this program must have a CPU that supports the AVX2 instruction set.
 *   **Memory Alignment**: Although the code internally uses unaligned memory access instructions (`_mm256_loadu_si256`, `_mm256_storeu_si256`) for flexibility, aligning input and output data buffers to a 32-byte boundary generally helps achieve better performance. Internally used structures like T-Tables are already aligned using `alignas(32)`.
 
+Based on Intel® Xeon® E5-2697 v4 2.30 GHz single-threaded environment
+
 # Compilation
 ```
 gcc sm4.c -O3 -march=native test.c -o test
