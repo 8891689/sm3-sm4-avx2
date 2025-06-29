@@ -61,6 +61,10 @@ Based on Intel® Xeon® E5-2697 v4 2.30 GHz single-threaded environment
 # Compilation
 ```
 gcc sm4.c -O3 -march=native test.c -o test
+
+gcc zuc.c -O3 -march=native zuc_test.c -o zuc_test
+
+
 ```
 # Test
 ```
@@ -90,13 +94,40 @@ Decryption Performance:
   Bytes processed: 16000000 B
   Throughput: 123.52 MB/s
   Blocks per second: 8094806
+
+./zuc_test
+=== ZUC Algorithm Implementation ===
+
+Test Vector 1 (All zeros):
+0x27BEDE74 0x018082DA 0x87D4E5B6 0x9F18BF66 0x32070E0F
+0x39B7B692 0xB4673EDC 0x3184A48E 0x27636F44 0x14510D62
+
+
+Test Vector 2 (All ones):
+0x0657CFA0 0x7096398B 0x734B6CB4 0x883EEDF4 0x257A76EB
+0x97595208 0xD884ADCD 0xB1CBFFB8 0xE0F9D158 0x46A0EED0
+
+
+Test Vector 3 (Original values):
+0x6E7DC9E4 0xFD29D3F6 0x7FB6F514 0x16679BC6 0x5C5B2B3C
+0x7A1819C7 0x3DA1A223 0xE3D6D883 0x67FA1BB2 0xF446118E
+
+--- Throughput Test ---
+Test parameters: 262144 words (1048576 bytes) per run, 1000 iterations.
+Total data to generate: 1000.00 MB
+Total time taken: 5.1494 seconds
+Total bytes generated: 1048576000 bytes
+Throughput: 194.20 MB/s (Megabytes per second)
+Throughput: 1.63 Gbps (Gigabits per second)
+
 ```
 
 
 # Compilation
 
 ```
-gcc -O3 -mavx2 -march=native sm4_avx.c -o test_avx test_avx.c
+gcc -O3 -mavx2 -march=native sm4_avx.c test_avx.c -o test_avx 
+gcc -O3 -mavx2 -march=native sm3_avx.c sm3_avx_test.c -o sm3_test
 ```
 
 # Test
@@ -135,6 +166,34 @@ Operations: 15419829 blocks/s
 -------------------------------------------------
 
 Performance test decryption of first block: PASS
+
+./sm3_test
+--- SM3 Correctness Test with 'abc' ---
+
+--- Running Single Channel SM3 for 'abc' ---
+Single channel 'abc' hash: 66c7f0f4 62eeedd9 d1f2d46b dc10e4e2 4167c487 5cf2f7a2 297da02b 8f4ba8e0 
+
+--- Running 8-Channel AVX2 SM3 for 'abc' ---
+
+--- Comparing 8-Channel 'abc' Results with Single Channel Reference ---
+Channel 0 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 1 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 2 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 3 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 4 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 5 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 6 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 7 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+
+
+--- Throughput Measurement for 8-Channel AVX2 SM3 ---
+Warming up (running 10 iterations)...
+Warm-up complete. Starting measurement.
+
+Measurement complete.
+Total data processed: 800.00 MB (across 8 channels, 100 iterations)
+Elapsed time: 1.2561 seconds
+Throughput: 636.87 MB/s (0.62 GB/s)
 
 ```
 
