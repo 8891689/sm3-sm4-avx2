@@ -70,6 +70,8 @@ gcc zuc.c -O3 -march=native zuc_test.c -o zuc_test
 ```
 # Test
 ```
+===========================================================================================
+
 ./sm3_test
 ----------------------------------------
 SM3 Functionality Verification
@@ -103,6 +105,7 @@ Hash operations completed: 316
 Total data processed: 316.00 MB
 Throughput: 115.29 MB/s
 
+===========================================================================================
 ./test
 SM4 Algorithm Test & Benchmark
 --------------------------------
@@ -130,6 +133,8 @@ Decryption Performance:
   Throughput: 123.52 MB/s
   Blocks per second: 8094806
 
+===========================================================================================
+
 ./zuc_test
 === ZUC Algorithm Implementation ===
 
@@ -155,6 +160,7 @@ Total bytes generated: 1048576000 bytes
 Throughput: 194.20 MB/s (Megabytes per second)
 Throughput: 1.63 Gbps (Gigabits per second)
 
+===========================================================================================
 ```
 
 
@@ -168,6 +174,7 @@ gcc -O3 -mavx2 -march=native sm3_avx.c sm3_avx_test.c -o sm3_test
 # Test
 
 ```
+===========================================================================================
 ./test_avx
 SM4 AVX 8-Block Target Implementation Test Suite
 ================================================
@@ -202,6 +209,9 @@ Operations: 15419829 blocks/s
 
 Performance test decryption of first block: PASS
 
+===========================================================================================
+
+
 ./sm3_test
 --- SM3 Correctness Test with 'abc' ---
 
@@ -230,6 +240,7 @@ Total data processed: 800.00 MB (across 8 channels, 100 iterations)
 Elapsed time: 1.2561 seconds
 Throughput: 636.87 MB/s (0.62 GB/s)
 
+===========================================================================================
 ```
 
 
