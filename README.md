@@ -60,6 +60,8 @@ Based on Intel® Xeon® E5-2697 v4 2.30 GHz single-threaded environment
 
 # Compilation
 ```
+gcc sm3.c -O3 -march=native sm3_test.c -o sm3_test
+
 gcc sm4.c -O3 -march=native test.c -o test
 
 gcc zuc.c -O3 -march=native zuc_test.c -o zuc_test
@@ -68,6 +70,39 @@ gcc zuc.c -O3 -march=native zuc_test.c -o zuc_test
 ```
 # Test
 ```
+./sm3_test
+----------------------------------------
+SM3 Functionality Verification
+----------------------------------------
+Test 1: Empty Message
+Hash:
+   1ab21d83 55cfa17f 8e611948 31e81a8f 22bec8c7 28fefb74 7ed035eb 5082aa2b 
+Expected: 1ab21d83 55cfa17f 8e611948 31e81a8f 22bec8c7 28fefb74 7ed035eb 5082aa2b
+
+Test 2: "abc"
+Hash:
+   66c7f0f4 62eeedd9 d1f2d46b dc10e4e2 4167c487 5cf2f7a2 297da02b 8f4ba8e0 
+Expected: 66c7f0f4 62eeedd9 d1f2d46b dc10e4e2 4167c487 5cf2f7a2 297da02b 8f4ba8e0
+
+Test 3: "abcd"*16
+Hash:
+   debe9ff9 2275b8a1 38604889 c18e5a4d 6fdb70e5 387e5765 293dcba3 9c0c5732 
+Expected: debe9ff9 2275b8a1 38604889 c18e5a4d 6fdb70e5 387e5765 293dcba3 9c0c5732
+
+
+----------------------------------------
+SM3 Performance Test
+----------------------------------------
+Performance Test:
+Buffer Size per operation: 1024 KB
+Test will run for approximately 3 seconds...
+
+Test finished.
+Total time elapsed: 3.0012 seconds
+Hash operations completed: 316
+Total data processed: 316.00 MB
+Throughput: 115.29 MB/s
+
 ./test
 SM4 Algorithm Test & Benchmark
 --------------------------------
