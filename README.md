@@ -167,13 +167,49 @@ Throughput: 1.63 Gbps (Gigabits per second)
 # Compilation
 
 ```
-gcc -O3 -mavx2 -march=native sm4_avx.c test_avx.c -o test_avx 
+gcc -O3 -mavx2 -march=native zuc_avx.c test_zuc_avx.c -o test_zuc_avx         //Normal version
+
+gcc -O3 -mavx2 -march=native zuc_avx2.c test_zuc_avx2.c -o test_zuc_avx2     //high speed version
+
 gcc -O3 -mavx2 -march=native sm3_avx.c sm3_avx_test.c -o sm3_test
+
+gcc -O3 -mavx2 -march=native sm4_avx.c test_avx.c -o test_avx 
+
 ```
 
 # Test
 
 ```
+===========================================================================================
+./test_zuc_avx
+Test Vector 1 (All zeros):
+0x27BEDE74 0x018082DA 0x87D4E5B6 0x9F18BF66 0x32070E0F 
+Test Vector 2 (All ones):
+0x0657CFA0 0x7096398B 0x734B6CB4 0x883EEDF4 0x257A76EB 
+
+--- Throughput Test ---
+Test parameters: 262144 words (1048576 bytes) per run, 1000 iterations.
+Total data to generate: 1048.58 MB
+Total time taken: 2.2530 seconds
+Total bytes generated: 1048576000 bytes
+Throughput: 465.42 MB/s (Megabytes per second)
+Throughput: 3.72 Gbps (Gigabits per second)
+
+===========================================================================================
+./test_zuc_avx2
+Test Vector 1 (All zeros):
+0x27BEDE74 0x018082DA 0x87D4E5B6 0x9F18BF66 0x32070E0F 
+Test Vector 2 (All ones):
+0x0657CFA0 0x7096398B 0x734B6CB4 0x883EEDF4 0x257A76EB 
+
+--- Throughput Test ---
+Test parameters: 262144 words (1048576 bytes) per run, 1000 iterations.
+Total data to generate: 1048.58 MB
+Total time taken: 1.5416 seconds
+Total bytes generated: 1048576000 bytes
+Throughput: 680.17 MB/s (Megabytes per second)
+Throughput: 5.44 Gbps (Gigabits per second)
+
 ===========================================================================================
 ./test_avx
 SM4 AVX 8-Block Target Implementation Test Suite
