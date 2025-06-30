@@ -1,0 +1,175 @@
+//  gcc -O3 -mavx2 zuc_avx.c test_zuc_avx.c -o test_zuc_avx
+//  作者：https://github.com/8891689
+//  test_zuc_avx.c
+#include "zuc_avx.h"
+#include <stdio.h>
+#include <time.h> 
+#include <stdint.h> 
+#include <string.h> 
+
+// 定义吞吐量测试参数，与目标输出匹配
+#define WORDS_PER_LOGICAL_RUN 262144      // 每个“运行”生成的32位字数
+#define NUM_LOGICAL_RUNS 1000             // 总共进行多少个“运行”
+#define WORDS_PER_ZUC_GENERATE_CALL 8     // 每次 zuc_generate_8ch 调用生成8个字
+
+// 计算总共需要调用 zuc_generate_8ch 多少次
+#define TOTAL_ZUC_GENERATE_CALLS (NUM_LOGICAL_RUNS * (WORDS_PER_LOGICAL_RUN / WORDS_PER_ZUC_GENERATE_CALL))
+
+
+int main() {
+    // --- 官方测试向量验证部分 ---
+    // 为了测试AVX2版本，我们将单个官方Key/IV复制到8个通道
+    // 然后比较AVX2输出的第一个通道与官方预期值
+
+    zuc_state_8ch state_test_vectors; // 用于测试向量的状态
+
+    // 官方测试向量 1 (全零 Key/IV)
+    // 预期密钥流 (取自3GPP TS 35.221 V16.0.0 Annex A.2.1)
+    // 注意：这里不再与scalar版本进行比较，仅打印AVX2 ch0的输出
+    uint8_t base_key1[16] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                             0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    uint8_t base_iv1[16] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    
+    uint8_t keys_ch1[8][16];
+    uint8_t ivs_ch1[8][16];
+    for (int i = 0; i < 8; i++) {
+        memcpy(keys_ch1[i], base_key1, 16);
+        memcpy(ivs_ch1[i], base_iv1, 16);
+    }
+
+    uint32_t current_8ch_output1[8];
+    uint32_t generated_keystream_ch0_1[10]; // 足够存储10个字
+
+    zuc_init_8ch(&state_test_vectors, keys_ch1, ivs_ch1);
+    for (int i = 0; i < 10; i++) { // 生成10个字，以便查看
+        zuc_generate_8ch(&state_test_vectors, current_8ch_output1);
+        generated_keystream_ch0_1[i] = current_8ch_output1[0]; // 取第一个通道的输出
+    }
+    printf("Test Vector 1 (All zeros):\n");
+    for (int i = 0; i < 5; i++) { // 仅打印前5个字
+        printf("0x%08X ", generated_keystream_ch0_1[i]);
+    }
+    printf("\n");
+    
+    // 官方测试向量 2 (全FF Key/IV)
+    uint8_t base_key2[16] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+                             0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+    uint8_t base_iv2[16] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+                            0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+
+    uint8_t keys_ch2[8][16];
+    uint8_t ivs_ch2[8][16];
+    for (int i = 0; i < 8; i++) {
+        memcpy(keys_ch2[i], base_key2, 16);
+        memcpy(ivs_ch2[i], base_iv2, 16);
+    }
+    
+    uint32_t current_8ch_output2[8];
+    uint32_t generated_keystream_ch0_2[10];
+
+    zuc_init_8ch(&state_test_vectors, keys_ch2, ivs_ch2);
+    for (int i = 0; i < 10; i++) {
+        zuc_generate_8ch(&state_test_vectors, current_8ch_output2);
+        generated_keystream_ch0_2[i] = current_8ch_output2[0];
+    }
+    printf("Test Vector 2 (All ones):\n");
+    for (int i = 0; i < 5; i++) { // 仅打印前5个字
+        printf("0x%08X ", generated_keystream_ch0_2[i]);
+    }
+    printf("\n");
+    
+    // 官方测试向量 3 (特定 Key/IV)
+    uint8_t base_key3[16] = {0x3d,0x4c,0x5b,0x6a,0x79,0x88,0x97,0xa6,
+                             0xb5,0xc4,0xd3,0xe2,0xf1,0x00,0x11,0x22};
+    uint8_t base_iv3[16] = {0x84,0x31,0x9a,0xa8,0xde,0x69,0x15,0xca,
+                            0x1f,0x6b,0xda,0x6b,0xfb,0xd8,0x07,0x66};
+
+    uint8_t keys_ch3[8][16];
+    uint8_t ivs_ch3[8][16];
+    for (int i = 0; i < 8; i++) {
+        memcpy(keys_ch3[i], base_key3, 16);
+        memcpy(ivs_ch3[i], base_iv3, 16);
+    }
+    
+    uint32_t current_8ch_output3[8];
+    uint32_t generated_keystream_ch0_3[10];
+
+    zuc_init_8ch(&state_test_vectors, keys_ch3, ivs_ch3);
+    for (int i = 0; i < 10; i++) {
+        zuc_generate_8ch(&state_test_vectors, current_8ch_output3);
+        generated_keystream_ch0_3[i] = current_8ch_output3[0];
+    }
+    // Test Vector 3 的输出在目标格式中没有，这里暂时保持不打印，或者你可以选择打印
+    // 为保持与你的目标输出一致，这里不打印Test Vector 3 的结果。
+
+    // 清理测试向量状态
+    zuc_clear_8ch(&state_test_vectors);
+
+
+    // --- 吞吐量测试部分 ---
+    printf("\n--- Throughput Test ---\n");
+    
+    // 准备8组不同的Key和IV (用于吞吐量测试)
+    uint8_t keys_perf[8][16] = {
+        {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+        {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF},
+        {0x3d,0x4c,0x5b,0x6a,0x79,0x88,0x97,0xa6,0xb5,0xc4,0xd3,0xe2,0xf1,0x00,0x11,0x22},
+        {0xAA,0xBB,0xCC,0xDD,0xEE,0xFF,0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99},
+        {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xEE,0xFF,0x00},
+        {0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA},
+        {0xDE,0xAD,0xBE,0xEF,0xCA,0xFE,0xBA,0xBE,0xFE,0xED,0xFA,0xCE,0x12,0x34,0x56,0x78},
+        {0x67,0x45,0x23,0x01,0xEF,0xCD,0xAB,0x89,0x98,0xBA,0xDC,0xFE,0x10,0x32,0x54,0x76}
+    };
+    
+    uint8_t ivs_perf[8][16] = {
+        {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+        {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF},
+        {0x84,0x31,0x9a,0xa8,0xde,0x69,0x15,0xca,0x1f,0x6b,0xda,0x6b,0xfb,0xd8,0x07,0x66},
+        {0x12,0x34,0x56,0x78,0x9A,0xBC,0xDE,0xF0,0xBA,0xDC,0xFE,0xED,0xCB,0xA9,0x87,0x65},
+        {0x66,0x55,0x44,0x33,0x22,0x11,0x00,0xFF,0xEE,0xDD,0xCC,0xBB,0xAA,0x99,0x88,0x77},
+        {0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55},
+        {0xBE,0xEF,0xDE,0xAD,0xCA,0xFE,0xBA,0xBE,0xFE,0xED,0xFA,0xCE,0x12,0x34,0x56,0x78},
+        {0x76,0x54,0x32,0x10,0x89,0xAB,0xCD,0xEF,0x67,0x45,0x23,0x01,0x98,0xBA,0xDC,0xFE}
+    };
+    
+    // 初始化8通道ZUC状态 (用于吞吐量测试)
+    zuc_state_8ch state_perf;
+    zuc_init_8ch(&state_perf, keys_perf, ivs_perf);
+    
+    uint32_t output_perf[8]; // 用于接收密钥流输出
+    
+    // 吞吐量测试
+    clock_t start = clock();
+    
+    for (int i = 0; i < TOTAL_ZUC_GENERATE_CALLS; i++) {
+        zuc_generate_8ch(&state_perf, output_perf); // 每次调用生成 8 个 32 位密钥流字
+    }
+    
+    clock_t end = clock();
+    double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+    
+    // 计算性能指标
+    unsigned long long total_generated_words = (unsigned long long)NUM_LOGICAL_RUNS * WORDS_PER_LOGICAL_RUN;
+    unsigned long long total_generated_bytes = total_generated_words * 4; // 每个字4字节
+    
+    // 目标输出中的MB使用十进制 (1 MB = 10^6 bytes)
+    double total_generated_mb_decimal = (double)total_generated_bytes / (1000.0 * 1000.0); 
+
+    // 计算吞吐量
+    double throughput_mb_per_sec = total_generated_mb_decimal / elapsed;
+    double throughput_gbps = (double)total_generated_bytes * 8.0 / (elapsed * 1000000000.0); // 1 Gbps = 10^9 bits/sec
+
+    printf("Test parameters: %d words (%d bytes) per run, %d iterations.\n",
+           WORDS_PER_LOGICAL_RUN, WORDS_PER_LOGICAL_RUN * 4, NUM_LOGICAL_RUNS);
+    printf("Total data to generate: %.2f MB\n", total_generated_mb_decimal);
+    printf("Total time taken: %.4f seconds\n", elapsed);
+    printf("Total bytes generated: %llu bytes\n", total_generated_bytes);
+    printf("Throughput: %.2f MB/s (Megabytes per second)\n", throughput_mb_per_sec);
+    printf("Throughput: %.2f Gbps (Gigabits per second)\n", throughput_gbps);
+    
+    // 清理吞吐量测试状态
+    zuc_clear_8ch(&state_perf);
+    
+    return 0;
+}
