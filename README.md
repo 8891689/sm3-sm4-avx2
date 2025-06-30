@@ -24,13 +24,13 @@ This implementation includes the complete workflow, including key scheduling, th
 
 ## Compilation Instructions
 
-When compiling a project that includes this `avx.c` file, ensure that the option to enable the AVX2 instruction set is specified for the compiler. For example, for GCC or Clang compilers, the `-mavx2` flag is typically used. Additionally, it is recommended to enable compiler optimization options (e.g., `-O2` or `-O3`) for optimal performance.
+When compiling a project that includes this `.c` file, ensure that the option to enable the AVX2 instruction set is specified for the compiler. For example, for GCC or Clang compilers, the `-mavx2` flag is typically used. Additionally, it is recommended to enable compiler optimization options (e.g., `-O2` or `-O3`) for optimal performance.
 
 ## API Usage
 
 This implementation is primarily operated through a context structure `avx_ctx` and two core functions.
 
-1.  **Context Structure `sm4_avx_ctx`**
+1.  **Context Structure `avx_ctx`**
     *   This structure is used to store all state information during the encryption/decryption process, including the scheduled round keys, the original key, the current operation mode (encrypt or decrypt), and a flag indicating if the key has been scheduled. You need to define a variable of this structure type before using the API.
 
 2.  **Initialization Function `avx_init`**
