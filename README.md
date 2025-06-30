@@ -1,15 +1,15 @@
 # ZUC SM3 SM4 AVX2 optimized and common implementation of encryption algorithm
 ## Introduction
 
-This project is a C-language implementation compatible (C++) of the SM4 block cipher algorithm. Its core feature is deep optimization using Intel AVX (Advanced Vector Extensions) instructions, which significantly improves the speed of encryption and decryption operations. The implementation is able to process 8 SM4 data blocks (a total of 128 bytes) in parallel using SIMD (Single Instruction Multiple Data) technology. For any remaining data that does not constitute a complete 8 data blocks, the algorithm seamlessly falls back to traditional scalar processing methods to ensure complete data processing.
+This project is a C-language implementation compatible (C++) of the block cipher algorithm. Its core feature is deep optimization using Intel AVX (Advanced Vector Extensions) instructions, which significantly improves the speed of encryption and decryption operations. The implementation is able to process 8 data blocks (a total of 128 bytes) in parallel using SIMD (Single Instruction Multiple Data) technology. For any remaining data that does not constitute a complete 8 data blocks, the algorithm seamlessly falls back to traditional scalar processing methods to ensure complete data processing.
 
-This implementation includes the complete SM4 workflow, including key scheduling, the generation of internal T-Tables (pre-computed S-box and linear transformation L results) accelerated by AVX gather instructions, and data block transposition to suit the SIMD parallel architecture.
+This implementation includes the complete workflow, including key scheduling, the generation of internal T-Tables (pre-computed S-box and linear transformation L results) accelerated by AVX gather instructions, and data block transposition to suit the SIMD parallel architecture.
 
 ## Key Features
 
-*   **SM4 Algorithm Implementation**: Full support for SM4 encryption and decryption operations.
+*   **Algorithm Implementation**: Full support for encryption and decryption operations.
 *   **High-Performance AVX2 Optimization**: Utilizes AVX2 instructions (especially `_mm256_i32gather_epi32`, etc.) to process 8 data blocks in parallel, greatly improving throughput.
-*   **Dynamic T-Table Generation and Optimized Lookup**: Dynamically generates the T-Tables required by SM4 during initial execution and uses AVX gather instructions for efficient parallel lookups.
+*   **Dynamic T-Table Generation and Optimized Lookup**: Dynamically generates the T-Tables required by during initial execution and uses AVX gather instructions for efficient parallel lookups.
 *   **Data Transposition**: Performs necessary transposition operations on input and output data blocks to adapt to AVX data layout.
 *   **Cross-Platform Endianness Handling**: Built-in logic to automatically handle byte order (Endianness) conversions for different operating system platforms (Linux, macOS, Windows).
 *   **Hybrid Processing Capability**: Employs AVX parallel processing for data block counts divisible by 8; seamlessly switches to scalar mode for any remaining blocks.
@@ -24,31 +24,31 @@ This implementation includes the complete SM4 workflow, including key scheduling
 
 ## Compilation Instructions
 
-When compiling a project that includes this `sm4_avx.c` file, ensure that the option to enable the AVX2 instruction set is specified for the compiler. For example, for GCC or Clang compilers, the `-mavx2` flag is typically used. Additionally, it is recommended to enable compiler optimization options (e.g., `-O2` or `-O3`) for optimal performance.
+When compiling a project that includes this `avx.c` file, ensure that the option to enable the AVX2 instruction set is specified for the compiler. For example, for GCC or Clang compilers, the `-mavx2` flag is typically used. Additionally, it is recommended to enable compiler optimization options (e.g., `-O2` or `-O3`) for optimal performance.
 
 ## API Usage
 
-This implementation is primarily operated through a context structure `sm4_avx_ctx` and two core functions.
+This implementation is primarily operated through a context structure `avx_ctx` and two core functions.
 
 1.  **Context Structure `sm4_avx_ctx`**
-    *   This structure is used to store all state information during the SM4 encryption/decryption process, including the scheduled round keys, the original key, the current operation mode (encrypt or decrypt), and a flag indicating if the key has been scheduled. You need to define a variable of this structure type before using the API.
+    *   This structure is used to store all state information during the encryption/decryption process, including the scheduled round keys, the original key, the current operation mode (encrypt or decrypt), and a flag indicating if the key has been scheduled. You need to define a variable of this structure type before using the API.
 
-2.  **Initialization Function `sm4_avx_init`**
-    *   **Purpose**: Initializes the `sm4_avx_ctx` context structure and performs key scheduling.
+2.  **Initialization Function `avx_init`**
+    *   **Purpose**: Initializes the `avx_ctx` context structure and performs key scheduling.
     *   **Parameters**:
-        *   A pointer to an `sm4_avx_ctx` structure.
-        *   A pointer to the 16-byte SM4 key.
+        *   A pointer to an `avx_ctx` structure.
+        *   A pointer to the 16-byte key.
         *   An integer specifying the operation mode: `1` for encryption mode, `0` for decryption mode.
     *   **Behavior**: This function stores the key in the context and computes and stores the round keys for subsequent encryption/decryption based on the specified mode. If set to decryption mode, the order of round keys will be adjusted accordingly.
 
-3.  **Encryption/Decryption Function `sm4_avx_encrypt_blocks`**
+3.  **Encryption/Decryption Function `avx_encrypt_blocks`**
     *   **Purpose**: Performs encryption or decryption on a specified number of data blocks based on the initialized context.
     *   **Parameters**:
-        *   A pointer to an initialized `sm4_avx_ctx` context structure.
+        *   A pointer to an initialized `avx_ctx` context structure.
         *   A pointer to the input data buffer.
         *   A pointer to the output data buffer.
-        *   A `size_t` value indicating the number of SM4 data blocks to process (Note: each SM4 data block is 16 bytes).
-    *   **Behavior**: The function reads data from the input buffer, performs SM4 operations according to the mode (encrypt or decrypt) and round keys set in the context, and writes the result to the output buffer. It prioritizes AVX parallel processing and uses scalar mode for any remaining blocks less than 8.
+        *   A `size_t` value indicating the number of data blocks to process (Note: each data block is 16 bytes).
+    *   **Behavior**: The function reads data from the input buffer, performs operations according to the mode (encrypt or decrypt) and round keys set in the context, and writes the result to the output buffer. It prioritizes AVX parallel processing and uses scalar mode for any remaining blocks less than 8.
 
 ## Notes
 
@@ -70,6 +70,33 @@ gcc zuc.c -O3 -march=native zuc_test.c -o zuc_test
 ```
 # Test
 ```
+===========================================================================================
+
+./zuc_test
+=== ZUC Algorithm Implementation ===
+
+Test Vector 1 (All zeros):
+0x27BEDE74 0x018082DA 0x87D4E5B6 0x9F18BF66 0x32070E0F
+0x39B7B692 0xB4673EDC 0x3184A48E 0x27636F44 0x14510D62
+
+
+Test Vector 2 (All ones):
+0x0657CFA0 0x7096398B 0x734B6CB4 0x883EEDF4 0x257A76EB
+0x97595208 0xD884ADCD 0xB1CBFFB8 0xE0F9D158 0x46A0EED0
+
+
+Test Vector 3 (Original values):
+0x6E7DC9E4 0xFD29D3F6 0x7FB6F514 0x16679BC6 0x5C5B2B3C
+0x7A1819C7 0x3DA1A223 0xE3D6D883 0x67FA1BB2 0xF446118E
+
+--- Throughput Test ---
+Test parameters: 262144 words (1048576 bytes) per run, 1000 iterations.
+Total data to generate: 1000.00 MB
+Total time taken: 5.1494 seconds
+Total bytes generated: 1048576000 bytes
+Throughput: 194.20 MB/s (Megabytes per second)
+Throughput: 1.63 Gbps (Gigabits per second)
+
 ===========================================================================================
 
 ./sm3_test
@@ -132,33 +159,6 @@ Decryption Performance:
   Bytes processed: 16000000 B
   Throughput: 123.52 MB/s
   Blocks per second: 8094806
-
-===========================================================================================
-
-./zuc_test
-=== ZUC Algorithm Implementation ===
-
-Test Vector 1 (All zeros):
-0x27BEDE74 0x018082DA 0x87D4E5B6 0x9F18BF66 0x32070E0F
-0x39B7B692 0xB4673EDC 0x3184A48E 0x27636F44 0x14510D62
-
-
-Test Vector 2 (All ones):
-0x0657CFA0 0x7096398B 0x734B6CB4 0x883EEDF4 0x257A76EB
-0x97595208 0xD884ADCD 0xB1CBFFB8 0xE0F9D158 0x46A0EED0
-
-
-Test Vector 3 (Original values):
-0x6E7DC9E4 0xFD29D3F6 0x7FB6F514 0x16679BC6 0x5C5B2B3C
-0x7A1819C7 0x3DA1A223 0xE3D6D883 0x67FA1BB2 0xF446118E
-
---- Throughput Test ---
-Test parameters: 262144 words (1048576 bytes) per run, 1000 iterations.
-Total data to generate: 1000.00 MB
-Total time taken: 5.1494 seconds
-Total bytes generated: 1048576000 bytes
-Throughput: 194.20 MB/s (Megabytes per second)
-Throughput: 1.63 Gbps (Gigabits per second)
 
 ===========================================================================================
 ```
