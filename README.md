@@ -211,6 +211,37 @@ Throughput: 680.17 MB/s (Megabytes per second)
 Throughput: 5.44 Gbps (Gigabits per second)
 
 ===========================================================================================
+
+./sm3_test
+--- SM3 Correctness Test with 'abc' ---
+
+--- Running Single Channel SM3 for 'abc' ---
+Single channel 'abc' hash: 66c7f0f4 62eeedd9 d1f2d46b dc10e4e2 4167c487 5cf2f7a2 297da02b 8f4ba8e0 
+
+--- Running 8-Channel AVX2 SM3 for 'abc' ---
+
+--- Comparing 8-Channel 'abc' Results with Single Channel Reference ---
+Channel 0 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 1 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 2 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 3 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 4 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 5 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 6 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+Channel 7 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
+
+
+--- Throughput Measurement for 8-Channel AVX2 SM3 ---
+Warming up (running 10 iterations)...
+Warm-up complete. Starting measurement.
+
+Measurement complete.
+Total data processed: 800.00 MB (across 8 channels, 100 iterations)
+Elapsed time: 1.2561 seconds
+Throughput: 636.87 MB/s (0.62 GB/s)
+
+===========================================================================================
+
 ./test_avx
 SM4 AVX 8-Block Target Implementation Test Suite
 ================================================
@@ -244,37 +275,6 @@ Operations: 15419829 blocks/s
 -------------------------------------------------
 
 Performance test decryption of first block: PASS
-
-===========================================================================================
-
-
-./sm3_test
---- SM3 Correctness Test with 'abc' ---
-
---- Running Single Channel SM3 for 'abc' ---
-Single channel 'abc' hash: 66c7f0f4 62eeedd9 d1f2d46b dc10e4e2 4167c487 5cf2f7a2 297da02b 8f4ba8e0 
-
---- Running 8-Channel AVX2 SM3 for 'abc' ---
-
---- Comparing 8-Channel 'abc' Results with Single Channel Reference ---
-Channel 0 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
-Channel 1 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
-Channel 2 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
-Channel 3 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
-Channel 4 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
-Channel 5 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
-Channel 6 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
-Channel 7 AVX2 Hash (len 3): 66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0 (MATCHES reference)
-
-
---- Throughput Measurement for 8-Channel AVX2 SM3 ---
-Warming up (running 10 iterations)...
-Warm-up complete. Starting measurement.
-
-Measurement complete.
-Total data processed: 800.00 MB (across 8 channels, 100 iterations)
-Elapsed time: 1.2561 seconds
-Throughput: 636.87 MB/s (0.62 GB/s)
 
 ===========================================================================================
 ```
