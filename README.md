@@ -1,4 +1,4 @@
-# ZUC SM3 SM4 AVX2 optimized and common implementation of SM4 encryption algorithm
+# ZUC SM3 SM4 AVX2 optimized and common implementation of encryption algorithm
 ## Introduction
 
 This project is a C-language implementation compatible (C++) of the SM4 block cipher algorithm. Its core feature is deep optimization using Intel AVX (Advanced Vector Extensions) instructions, which significantly improves the speed of encryption and decryption operations. The implementation is able to process 8 SM4 data blocks (a total of 128 bytes) in parallel using SIMD (Single Instruction Multiple Data) technology. For any remaining data that does not constitute a complete 8 data blocks, the algorithm seamlessly falls back to traditional scalar processing methods to ensure complete data processing.
